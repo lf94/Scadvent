@@ -1,0 +1,24 @@
+// Naive, "get the job done" version
+
+let
+  o = octahedron 1;
+in
+union [
+  o,
+  intersection [o, cube 1.1]  >> move [1.8, 0, 0],
+  intersection [o, cube 0.85] >> move [3.2, 0, 0],
+  intersection [
+      o,
+    cube 0.95,
+    cube 1.05 >> rotate { angle: 45*deg, axis: X_axis },
+    cube 1.05 >> rotate { angle: 45*deg, axis: Y_axis },
+    cube 1.05 >> rotate { angle: 45*deg, axis: Z_axis },
+  ] >> move [4.6, 0, 0],
+  intersection [
+      o,
+    cube 0.95,
+    cube 0.95 >> rotate { angle: 45*deg, axis: X_axis },
+    cube 0.95 >> rotate { angle: 45*deg, axis: Y_axis },
+    cube 0.95 >> rotate { angle: 45*deg, axis: Z_axis },
+  ] >> move [6.0, 0, 0],
+]

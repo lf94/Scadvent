@@ -1,0 +1,21 @@
+// Refined version, get as close to OpenSCAD as possible.
+
+let
+  h = 20;
+  o = octahedron;
+  oktaederstumpf a = intersection [o a, cube h];
+  rhombenkuboktaeder a = intersection [
+    o,
+    cube a,
+    cube a >> rotate { angle: 45*deg, axis: X_axis },
+    cube a >> rotate { angle: 45*deg, axis: Y_axis },
+    cube a >> rotate { angle: 45*deg, axis: Z_axis },
+  ];
+in
+union [
+  o h,
+  oktaederstumpf     (h/2*3)     >> move [1.8, 0, 0],
+  oktaederstumpf     (h/2*4)     >> move [3.2, 0, 0],
+  rhombenkuboktaeder (h/2.93)    >> move [4.6, 0, 0],
+  rhombenkuboktaeder (h/(3+1/3)) >> move [6.0, 0, 0],
+]

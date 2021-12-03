@@ -1,0 +1,22 @@
+// Naive version
+// Because Curv's method of unioning is currently slow (but can be corrected)
+// the alternative is to create an ellipsoid and cut out slices.
+
+let
+  rm = 20;
+  ro = rm/2;
+  zm = sqrt(rm^2 - (ro^2 + ro^2));
+  bl = 0.3;
+  sp = 0.6;
+  rb = (0.3+0.6)/2;
+in
+intersection [
+  difference [
+    ellipsoid [rm, rm, zm],
+    ellipsoid [rm, rm, zm-0.6]
+  ],
+  box [bl, inf, zm]
+  >> move [0, 0, zm/2]
+  >> repeat_xy [-rb, rb]
+]
+

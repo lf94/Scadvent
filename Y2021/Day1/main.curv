@@ -1,1 +1,44 @@
+let
+icosahedron =
+    let
+        v0 = normalize[1,1,1];
+        v1 = normalize[-1,1,1];
+        v2 = normalize[1,-1,1];
+        v3 = normalize[1,1,-1];
+        v4 = normalize[0, +1, phi+1];
+        v5 = normalize[0, -1, phi+1];
+        v6 = normalize[+phi+1, 0, 1];
+        v7 = normalize[-phi-1, 0, 1];
+        v8 = normalize[+1, phi+1, 0];
+        v9 = normalize[-1, phi+1, 0];
+        // radius of midsphere / radius of insphere
+        midratio = (phi/2) / (1/12*(3*sqrt(3)+sqrt(15)));
+        circumratio = (.25*sqrt(10+2*sqrt 5)) / (1/12*(3*sqrt(3)+sqrt(15)));
+        icosahedron_m d = let
+            r = d / 2;
+            fmin [a, b, r] = let
+              h = clamp [0.5+0.5*(b-a)/r, 0, 1];
+              in lerp [b, a, h] - r*h*(1.0-h);
+            in make_shape {
+                dist p :
+                    max [
+                        -fmin [abs(dot[p.[[X,Y,Z]], v0]), abs(dot[p.[[X,Y,Z]], v1]), 4],
+                        -fmin [abs(dot[p.[[X,Y,Z]], v2]), abs(dot[p.[[X,Y,Z]], v3]), 4],
+                        -fmin [abs(dot[p.[[X,Y,Z]], v4]), abs(dot[p.[[X,Y,Z]], v5]), 4],
+                        -fmin [abs(dot[p.[[X,Y,Z]], v6]), abs(dot[p.[[X,Y,Z]], v7]), 4],
+                        -fmin [abs(dot[p.[[X,Y,Z]], v8]), abs(dot[p.[[X,Y,Z]], v9]), 4],
+                    ] - r,
+                is_3d : true,
+                bbox : midratio * [[-r,-r,-r], [r,r,r]],
+            };
+    in {
+        ... icosahedron_m 2,
+        call : icosahedron_m,
+        circumratio : (.25*sqrt(10+2*sqrt 5)) / (1/12*(3*sqrt(3)+sqrt(15))),
+        mitred: {
+            ... icosahedron_m 2,
+            call: icosahedron_m
+        },
+    };
+in
 icosahedron 1
