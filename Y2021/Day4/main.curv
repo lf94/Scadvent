@@ -1,0 +1,12 @@
+let
+  max = 25;
+  s = 25*1.887;
+  h = 3;
+  dims = [for(i in 0..<25) let a = s*(0.887^i); in [a,a,h]];
+  rots = [for(i in 0..<25) (i+1)*(137.5/4)];
+in
+  union [for(i in 0..<25)
+    box (dims.[i])
+    >> rotate (rots.[i]*deg)
+    >> move [0,0,h*(i/2)]
+  ]
