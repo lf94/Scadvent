@@ -1,0 +1,32 @@
+// Refined version
+// Because Curv's method of unioning is currently slow (but can be corrected in
+// time), re-implementing union of boxes specifically can reduce the shader code
+// produced by a few magitudes (1MB -> 9KB).
+
+let
+cubion ps =
+    let pl = count ps;
+    in
+    make_shape {
+        dist [x,y,z,t] : do
+          local a = nothing.dist [x,y,z,t];
+          for (i in 0..<pl) (
+            local p = ps.[i];
+            a := min[a,
+              box.dist [x - p.[X],y - p.[Y], z - p.[Z], t]];
+          ) in a,
+        is_2d : false,
+        is_3d : true,
+    };
+
+  r = 10;
+  rs = r*r;
+  ps = [for (x in (-r..r by 1))
+      ...[for (y in (-r..r by 0.3))
+        let z = rs - (x^2 + y^2);
+        in if(z < 0) () else [x,y,sqrt z]
+      ]
+    ];
+in
+  cubion ps
+
