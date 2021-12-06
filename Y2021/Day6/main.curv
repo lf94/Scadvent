@@ -1,0 +1,41 @@
+let
+//IQ Star
+star r n m = make_shape {
+  dist p = do
+     // next 4 lines can be precomputed for a given shape
+    local an = 3.141593/n;
+    local en = 3.141593/m;  // m is between 2 and n
+    local acs = [cos an,sin an];
+    local ecs = [cos en,sin en]; // ecs=vec2(0,1) for regular polygon
+
+    local bn = mod [phase (p.[[X,Y]]),2.0*an] - an;
+    local q = [cos bn,abs(sin bn)]*(mag (p.[[X,Y]]));
+    q := q - (r*acs);
+    q := (ecs*clamp[ -dot[q.[[X,Y]],ecs], 0.0, r*(acs.[Y])/(ecs.[Y])])+q;
+  in
+    (mag q)*(sign (q.[X])),
+  bbox = [[-r,-r,0], [r,r,0]],
+  is_2d = true,
+};
+
+// IQ Onion
+onion thickness shape = make_shape {
+  dist p = abs(shape.dist p) - thickness,
+  bbox = shape.bbox,
+  colour = shape.colour,
+  is_2d = shape.is_2d,
+  is_3d = shape.is_3d,
+};
+
+ring d t = circle (d - (t)) >> onion (t / 2);
+penta r =  star r 5 3 >> onion (0.2);
+
+r = 20;
+in
+union [for (i in 0..8) penta (r - 2 * i)] >> rotate (18*deg)
+>> into union [
+  ((smooth 2).union) [
+    ring ((7.5+(1/2))*2) 0.4 >> move [0, 30, 0],
+    rect [0.4, r - 2] >> move [0, r / 2 + 3, 0]
+  ]
+]
