@@ -18,26 +18,18 @@ star r n m = make_shape {
   is_2d = true,
 };
 
-// IQ Onion
-onion thickness shape = make_shape {
-  dist p = abs(shape.dist p) - thickness,
-  bbox = shape.bbox,
-  colour = shape.colour,
-  is_2d = shape.is_2d,
-  is_3d = shape.is_3d,
-};
-
-ring d t = circle (d - (t)) >> onion (t / 2);
-penta r =  star r 5 3 >> onion (0.2);
-
-r = 20;
+half_sphere = union [
+  star (30 - 4) 12 8 >> offset (4),
+  star (30 + 0) 12 2.7 >> offset (-4) >> scale (1.2),
+]
+>> into difference [half_plane {d: 0, normal: [1, 0]}]
+>> revolve
+>> into difference [half_space {d: 0, normal: [1, 0, 0]}];
 
 in
-union [for (i in 0..8) penta (r - 2 * i)] >> rotate (18*deg)
->> into union [
-  ((smooth 2).union) [
-    ring ((7.5+(1/2))*2) 0.4 >> move [0, 30, 0],
-    rect [0.4, r - 2] >> move [0, r / 2 + 3, 0]
-  ]
+union [
+  half_sphere,
+  half_sphere
+    >> reflect_x
+    >> rotate { angle: 90*deg + 60*deg, axis: X_axis }
 ]
->> extrude 1.0
