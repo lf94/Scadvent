@@ -1,0 +1,38 @@
+let
+cubec dim chamfer = intersection [
+ box dim,
+ box (dim - chamfer) >> rotate { angle: 45*deg, axis: X_axis },
+ box (dim - chamfer) >> rotate { angle: 45*deg, axis: Y_axis },
+ box (dim - chamfer) >> rotate { angle: 45*deg, axis: Z_axis },
+];
+c = cubec [1,1,1] (-0.35);
+t = [
+ [[1,1,1,1],
+  [0,0,0,0]],
+ [[0,0,0,2],
+  [0,0,1,1]],
+ [[0,1,1,0],
+  [1,1,0,0]],
+ [[1,1,0,0],
+  [1,1,0,0]],
+ [[0,0,2,0],
+  [0,0,1,1]],
+ [[0,1,1,1],
+  [0,0,0,1]],
+ [[0,0,1,2],
+  [0,0,0,1]],
+ [[0,0,1,0],
+  [0,1,1,1]],
+];
+res = map (a -> 
+  union [for(y in 0..<(count a))
+    for(x in 0..<(count (a.[y]))) union [
+      let h = a.[y].[x] in
+        if (h == 0) nothing
+        else for(z in 0..<h) c >> move [x*1,y*1,z*1]
+    ]
+]) t;
+in
+row res
+
+
