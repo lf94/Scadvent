@@ -1,0 +1,63 @@
+// NOTE: Needs to be cleaned up. Lots of repetition.
+ 
+let
+//IQ Star
+star r n m = make_shape {
+  dist p = do
+    // next 4 lines can be precomputed for a given shape
+    local an = 3.141593/n;
+    local en = 3.141593/m;  // m is between 2 and n
+    local acs = [cos an,sin an];
+    local ecs = [cos en,sin en]; // ecs=vec2(0,1) for regular polygon
+
+    local bn = mod [phase (p.[[X,Y]]),2.0*an] - an;
+    local q = [cos bn,abs(sin bn)]*(mag (p.[[X,Y]]));
+    q := q - (r*acs);
+    q := (ecs*clamp[ -dot[q.[[X,Y]],ecs], 0.0, r*(acs.[Y])/(ecs.[Y])])+q;
+  in
+    (mag q)*(sign (q.[X])),
+  bbox = [[-r,-r,r], [r,r,r]],
+  is_2d = true,
+};
+
+hexa r =  star (r) 6 2;
+
+eps = 0.1;
+d = 10;
+r = 0.2;
+h = 2;
+i = 0.4;
+
+outer = hexa (d - r) >> offset r >> extrude h;
+inner = hexa (d - i - r) >> offset r >> extrude i >> colour red;
+base = ((smooth eps).difference) [ outer, inner >> move [0, 0, (h-i)/2]];
+
+hexacone =
+  intersection [
+    hexa 1 >> extrude 1,
+    half_space { d: 0.19, normal: [0, 1, 1] },
+    half_space { d: 0.19, normal: [0, -1, 1] },
+    half_space { d: 0.19, normal: [cos (30*deg), sin (30*deg), 1] },
+    half_space { d: 0.19, normal: [cos (30*deg), -sin (30*deg), 1] },
+    half_space { d: 0.19, normal: [-cos (30*deg), sin (30*deg), 1] },
+    half_space { d: 0.19, normal: [-cos (30*deg), -sin (30*deg), 1] },
+  ]
+  >> into union [
+    hexa 1 >> extrude 0.2 >> move [0,0,-(0.5+0.1)],
+  ];
+
+hexline = hexacone >> rotate (90*deg) >> repeat_x 2;
+hexspace = union [
+  hexline,
+  hexline >> move [1, 1.7, 0],
+  hexline >> move [2, 3.4, 0]
+]
+>> rotate (-90*deg)
+>> move [-1.7, 0, 0]
+>> repeat_x 3.4
+>> rotate { angle: (180*deg), axis: Y_axis };
+in
+difference [
+  base,
+  intersection [hexa (d - i - r) >> offset r >> extrude inf, hexspace] >> move [0, 0, 0.14]
+]
